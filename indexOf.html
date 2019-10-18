@@ -1,0 +1,144 @@
+<script src="simpletest.js"></script>
+
+<script>
+    
+function indexOf(array, searchElement, fromIndex) {
+    
+    var startingIndex = 0;
+    
+    if (!Array.isArray(array)) {
+        throw new TypeError('IndexOf with no array');
+    } 
+    
+    if (arguments.length < 2) {
+        return -1;
+    }
+    
+    if (!fromIndex) {
+        startingIndex = 0;
+    } else if (fromIndex >= 0) {
+        startingIndex = fromIndex;
+    } else {
+        startingIndex = array.length + fromIndex;
+    }
+    
+    for (var i = startingIndex; i < array.length; i++) {
+        if (searchElement === array[i]) {
+            return i;
+        }
+    }
+    return -1;
+}
+        
+tests({
+   
+    'The first argument should be an array': function() {
+        var array = [1];
+        indexOf(array);
+        eq(Array.isArray(array), true);
+    },
+
+    'If not, it should throw TypeError': function() {
+      var isTypeError = false;
+        try {
+            indexOf(3);
+        } catch(e) {
+            isTypeError = (e instanceof TypeError);
+        }
+      eq(isTypeError, true);
+    },
+    
+    'If there is no second argument, it should return -1': function() {
+        var array = [1];
+        var foundIndex = indexOf(array);
+        eq(foundIndex, -1);
+    },
+      
+    'It should run array.length times': function() {
+        var i = 0;
+        var counter = 0;
+        var testArray = [1, 2, 3, 4, 5, 6];
+        var foundIndex = indexOf(testArray, 0);
+        while (i < testArray.length) {
+            counter++;
+            i++;
+        }
+        eq(counter, 6);
+    },  
+
+    'It should go through each element of the array, until it finds the searched element': function() {
+        var i = 0;
+        var counter = 0;
+        var testArray = [1, 2, 3, 4, 5, 6];
+        var foundIndex = indexOf(testArray, 4);
+        while (i <= foundIndex) {
+            counter++;
+            i++;
+        } 
+        eq(counter, 4);
+    },
+
+    'It should return the index of the first element that matches the second argument': function() {
+        var testArray = [1, 2, 3, 4, 5, 6];
+        var foundIndex = indexOf(testArray, 4);
+         
+        eq(foundIndex, 3);
+    },
+
+    'If there is no match, return -1': function() {
+        var testArray = [1, 2, 3, 4, 5, 6];
+        var foundIndex = indexOf(testArray, 7);
+         
+        eq(foundIndex, -1);
+    },
+
+    'The third argument (fromIndex) should represent the index from which the search begins': function() {
+        var counter = 0;
+        var array = [3, 2, 3];
+        var foundIndex = indexOf(array, 3, 1);
+        var i = 1
+        while (i <= foundIndex) {
+            counter++;
+            i++;
+        } 
+        eq(foundIndex, 2);
+        eq(counter, 2); 
+    },    
+
+   'If the third argument is negative, it should start the search from (array.length - fromIndex) index': function() {
+        var counter = 0;
+        var array = [3, 2, 3];
+        var foundIndex = indexOf(array, 3, -1);
+        var i = array.length - 1;
+        while (i <= foundIndex) {
+            counter++;
+            i++;
+        } 
+        eq(foundIndex, 2);
+        eq(counter, 1); 
+    },
+    
+    'If the third argument is greater or equal to the array length, return -1': function() {
+        var array = [1, 2, 3];
+        var foundIndex = indexOf(array, 3, 3);
+        
+        eq(foundIndex, -1);
+    },    
+
+    'If indexFrom does not exist, it will default to 0': function() {
+        var counter = 0;
+        var array = [1, 2, 3];
+        var foundIndex = indexOf(array, 3);
+        var i = 0;
+        while (i <= foundIndex) {
+            counter++;
+            i++;
+        } 
+        eq(foundIndex, 2);
+        eq(counter, 3); 
+    }
+
+});
+    
+</script>
+

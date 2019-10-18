@@ -1,0 +1,130 @@
+<script src="simpletest.js"></script>
+
+<script>
+    
+function concat(array) {
+    
+    var resultSoFar = [];
+    
+    if (!Array.isArray(array)) {
+            throw new TypeError('Concat with no array');
+    }
+    
+    for (var i = 0; i < arguments.length; i++) {
+        if (Array.isArray(arguments[i])) {
+            for (var j = 0; j < arguments[i].length; j++) {
+                if (arguments[i][j] === undefined) {
+                    arguments[i][j] = '';
+                }
+                resultSoFar.push((arguments[i])[j]);
+            }
+        } else {
+            var element = arguments[i];
+            resultSoFar.push(element); 
+        }    
+    }
+    
+    return resultSoFar;
+}    
+
+tests({
+
+  'The first argument should be an array': function() {
+        var returnedElement = concat([1]);
+        eq(Array.isArray(returnedElement), true);
+    },
+    
+  'If not, it should throw TypeError': function() {
+      var isTypeError = false;
+        try {
+            concat(3);
+        } catch(e) {
+            isTypeError = (e instanceof TypeError);
+        }
+      eq(isTypeError, true);
+    },
+    
+  'If there is only one element as an argument, it should return a copy of that element as an array': function() {
+      var testArray = [1];
+      var returnedElement = concat(testArray);
+      eq(returnedElement[0], 1);
+      eq(returnedElement !== testArray, true);
+  },
+    
+  'If there is there is more than one argument, it should return a new array made out of the arguments merged together': function() {
+      var array1 = [1, 2];
+      var array2 = [3, 4];
+      var returnedElement = concat(array1, array2);
+      
+      eq(returnedElement[0], 1);
+      eq(returnedElement[1], 2);
+      eq(returnedElement[2], 3);
+      eq(returnedElement[3], 4);
+      eq(returnedElement.length, 4);
+      eq(returnedElement !== array1, true);
+      eq(returnedElement !== array2, true);
+      
+  },
+    
+   'It should merge arrays and other data types': function() {
+      var array = [1, 2];
+      var element1 = 'a';
+      var element2 = true;
+      var element3 = null;
+      var element4 = undefined;   
+      var returnedElement = concat(array, element1, element2, element3, element4);
+      
+      eq(returnedElement[0], 1);
+      eq(returnedElement[1], 2);
+      eq(returnedElement[2], 'a');
+      eq(returnedElement[3], true);
+      eq(returnedElement[4], null);
+      eq(returnedElement[5], undefined);   
+      eq(returnedElement.length, 6);
+  },
+    
+    'It should merge arrays with objects': function() {
+        var array = [1, 2];
+        var element = {name: 'Paul', age: 32};
+        var returnedElement = concat(array, element);
+        
+        eq(returnedElement[0], 1);
+        eq(returnedElement[1], 2);
+        eq(returnedElement[2], element);
+        eq(returnedElement.length, 3);
+        
+    },
+    
+    'It should merge arrays with holes, adding every hole to the returned array': function() {
+      var array1 = [1, , 2];
+      var array2 = [, 3, 4, ,];
+      
+      var returnedElement = concat(array1, array2); 
+      
+      eq(returnedElement[0], 1);
+      eq(returnedElement[1], '');
+      eq(returnedElement[2], 2);
+      eq(returnedElement[3], '');
+      eq(returnedElement[4], 3);
+      eq(returnedElement[5], 4);
+      eq(returnedElement[6], '');  
+      eq(returnedElement.length, 7);
+  }
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

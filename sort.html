@@ -1,0 +1,289 @@
+<script src="simpletest.js"></script>
+
+<script>
+    
+function sort(array, compareFunction) {
+    
+    var decomposedArray = [];
+    var tempArray = [];
+    var str = '';
+    var done;
+    
+    if (!Array.isArray(array)) {
+        throw new TypeError('Sort with no array');
+    }
+    
+    if (!compareFunction) {
+        for (var i = 0; i < array.length; i++) {
+            str = array[i];
+            decomposedArray[i] = [];
+            if (str === undefined) {
+                decomposedArray[i] = [Infinity];
+                continue;
+            } 
+            if (typeof str !== 'string') {
+                str = JSON.stringify(str);
+            }
+            str = str.toLowerCase();
+            for (var j = 0; j < str.length; j++) {
+                decomposedArray[i][j] = str.charCodeAt(j);
+            }
+        }
+
+    done = false;
+    while (!done) {
+        done = true;
+        for (var i = 1; i < array.length; i++) {
+            for (var j = 0; j < Math.max(decomposedArray[i].length, decomposedArray[i - 1].length); j++) {
+                if (decomposedArray[i - 1][j] > decomposedArray[i][j] || !decomposedArray[i][j]) {
+                    done = false;
+                    tempArray = decomposedArray[i - 1];
+                    decomposedArray[i - 1] = decomposedArray[i];
+                    decomposedArray[i] = tempArray;
+                    tempArray = array[i - 1];
+                    array[i - 1] = array[i];
+                    array[i] = tempArray;
+                    break;
+                } else if (decomposedArray[i - 1] < decomposedArray[i] || !decomposedArray[i - 1][j]) {
+                    break;
+                } 
+            }   
+        }
+    }
+} else {
+    for (var i = 0; i < array.length; i++) {
+        if (array[i] === undefined) {
+            array[i] = Infinity;
+            continue;
+        }
+    }
+    done = false;
+    while (!done) {
+        done = true;
+        for (var i = 1; i < array.length; i++) { 
+            if (compareFunction(array[i - 1], array[i]) > 0) {
+                done = false;
+                tempArray = array[i - 1];
+                array[i - 1] = array[i];
+                array[i] = tempArray;
+                break;
+            }          
+        }
+    }
+}
+ 
+for (var i = 0; i < array.length; i++) {
+    if (array[i] === Infinity) {
+        array[i] = undefined;
+        continue;
+    }
+}    
+
+return array;
+    
+}
+
+tests({
+
+  'The first argument should be an array': function() {
+      var array = [1];
+      sort(array);
+      eq(Array.isArray(array), true);  
+  },
+    
+  'If not, it should throw TypeError': function() {
+      var isTypeError = false;
+      try {
+        sort(3);
+      } catch(e) {
+        isTypeError = (e instanceof TypeError);
+      }
+      eq(isTypeError, true);
+  },
+    
+  'If compareFunction is not supplied, it should sort the elements in alphabetical order, and return the array sorted(1)': function() {
+      var array = ['d', 'b', 'c', 'a'];
+      sort(array);
+      eq(array[0], 'a');
+      eq(array[1], 'b');
+      eq(array[2], 'c');
+      eq(array[3], 'd');
+      eq(array.length, 4);
+  },
+    
+  'If compareFunction is not supplied, it should sort the elements in alphabetical order, and return the array sorted(2)': function() {
+      var array = ['Paul', 'Gordon', 'Glenn', 'John'];
+      sort(array);
+      eq(array[0], 'Glenn');
+      eq(array[1], 'Gordon');
+      eq(array[2], 'John');
+      eq(array[3], 'Paul');
+      eq(array.length, 4);
+  },
+    
+  'If compareFunction is not supplied, it should sort the elements in alphabetical order, and return the array sorted(3)': function() {
+      var array = ['PaUl', 14, '2', true, 'a'];
+      sort(array);
+      eq(array[0], 14);
+      eq(array[1], '2');
+      eq(array[2], 'a');
+      eq(array[3], 'PaUl');
+      eq(array[4], true);
+      eq(array.length, 5);
+  },    
+    
+  'If compareFunction is not supplied, all undefined elements should be sorted to the end of the array': function() {
+      var array = ['z', undefined, null, , 'a'];
+      sort(array);
+      eq(array[0], 'a');
+      eq(array[1], null);
+      eq(array[2], 'z');
+      eq(array[3], undefined);
+      eq(array[4], undefined);
+      eq(array.length, 5);
+  },    
+    
+    
+  'If compareFunction(a, b) is less than 0, it should sort a to an index lower than b (i.e. a comes first).': function() {
+      var array = [5, 12];
+      sort(array, function(a, b) {
+          return a - b;
+      });
+      eq(array[0], 5);
+      eq(array[1], 12);
+  },
+    
+  'If compareFunction(a, b) is greater than 0, it should sort b to an index lower than a (i.e. b comes first).': function() {
+      var array = [12, 5];
+      sort(array, function(a, b) {
+          return a - b;
+      });
+      eq(array[0], 5);
+      eq(array[1], 12);
+  },
+    
+  'If compareFunction(a, b) is equal to 0, a and b should remain unchanged with respect to each other, but sorted with respect to all different elements': function() {
+      var array = [12, 5, 5, 3];
+      sort(array, function(a, b) {
+          return a - b;
+      });
+      eq(array[0], 3);
+      eq(array[1], 5);
+      eq(array[2], 5);
+      eq(array[3], 12);
+      eq(array.length, 4);
+  },
+    
+  'If compareFunction(a, b) exists, and the array elements are NaN, it should return the array unchanged': function() {
+      var array = ['c', true, 'a'];
+      sort(array, function(a, b) {
+          return a - b;
+      });
+      eq(array[0], 'c');
+      eq(array[1], true);
+      eq(array[2], 'a');
+      eq(array.length, 3);
+  },
+    
+  'If compareFunction(a, b) does not exist, numbers should be sorted correctly whether they are numbers or numeric strings': function() {
+      var array = ['14', '33', 27, 2];
+      sort(array);
+      eq(array[0], '14');
+      eq(array[1], 2);
+      eq(array[2], 27);
+      eq(array[3], '33');
+      eq(array.length, 4);
+  },                
+    
+  'If compareFunction(a, b) exists, numbers should be sorted correctly whether they are numbers or numeric strings': function() {
+      var array = ['14', '33', 27, 2];
+      sort(array, function(a, b) {
+          return a - b;
+      });
+      eq(array[0], 2);
+      eq(array[1], '14');
+      eq(array[2], 27);
+      eq(array[3], '33');
+      eq(array.length, 4);
+  },            
+        
+  'If compareFunction is supplied, all undefined elements should be sorted to the end of the array': function() {
+      var array = [4, undefined, 2, , 11];
+      sort(array, function(a, b) {
+          return a - b;
+      });
+      eq(array[0], 2);
+      eq(array[1], 4);
+      eq(array[2], 11);
+      eq(array[3], undefined);
+      eq(array[4], undefined);
+      eq(array.length, 5);
+  },
+    
+  'Objects should be sorted, given the value of one of their properties (by age).': function() {
+      var array = [
+          { name: 'George', age: 21 },
+          { name: 'Sam', age: 37 },
+          { name: 'Jon', age: 45 },
+          { name: 'Paul', age: -12 },
+          { name: 'Al', age: 13 },
+          { name: 'Chris', age: 27 }
+      ];
+      sort(array, function(a, b) {
+          return a.age - b.age;
+      });
+      eq(array[0].age, -12);
+      eq(array[1].age, 13);
+      eq(array[2].age, 21);
+      eq(array[3].age, 27);
+      eq(array[4].age, 37);
+      eq(array[5].age, 45);
+      eq(array.length, 6);
+  },
+    
+  'Objects should be sorted, given the value of one of their properties (by name).': function() {
+      var array = [
+          { name: 'George', age: 21 },
+          { name: 'Sam', age: 37 },
+          { name: 'Jon', age: 45 },
+          { name: 'Paul', age: -12 },
+          { name: 'Al', age: 13 },
+          { name: 'Chris', age: 27 }
+      ];
+      sort(array, function(a, b) {
+          var nameA = a.name.toLowerCase(); // ignore upper and lowercase
+          var nameB = b.name.toLowerCase(); // ignore upper and lowercase
+          if (nameA < nameB) {
+              return -1;
+          }
+          if (nameA > nameB) {
+              return 1;
+          }
+          return 0;
+              });
+              eq(array[0].name, 'Al');
+              eq(array[1].name, 'Chris');
+              eq(array[2].name, 'George');
+              eq(array[3].name, 'Jon');
+              eq(array[4].name, 'Paul');
+              eq(array[5].name, 'Sam');
+              eq(array.length, 6);
+  }        
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

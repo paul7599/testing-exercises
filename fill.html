@@ -1,0 +1,164 @@
+<script src="simpletest.js"></script>
+
+<script>
+    
+function fill(array, value, start, end) {
+    
+    var returnedArray = [];
+    var startingIndex = 0;
+    var length = array.length;
+    
+    if (!Array.isArray(array)) {
+        throw new TypeError('Fill with no array');
+    }
+    
+    if (!start || typeof start !== 'number') {
+        startingIndex = 0;
+    } else if (start >= 0) {
+        startingIndex = start;
+    } else {
+        startingIndex = array.length + start;
+    }
+    
+    if ((!end && end !== 0) || typeof end !== 'number') {
+        length = array.length;
+    } else if (end >= 0) {
+        length = end;
+    } else {
+        length = array.length + end;
+    }
+    
+    for (var i = startingIndex; i < length; i++) {
+        returnedArray[i] = value;
+    }
+    
+    for (var i = 0; i < startingIndex; i++) {
+        returnedArray[i] = array[i];
+    }
+    
+    for (var i = length; i < array.length; i++) {
+        returnedArray[i] = array[i];
+    }
+    
+    for (var i = 0; i < returnedArray.length; i++) {
+        array[i] = returnedArray[i]; 
+    }
+
+    return array;
+}
+
+tests({
+
+  'The first argument should be an array': function() {
+      var array = [1];
+      fill(array);
+      eq(Array.isArray(array), true);  
+  },
+    
+  'If not, it should throw TypeError': function() {
+      var isTypeError = false;
+      try {
+        fill(3);
+      } catch(e) {
+        isTypeError = (e instanceof TypeError);
+      }
+      eq(isTypeError, true);
+  },
+    
+  'If there is no start argument, it should modify all the elements with the second argument and return the modified array': function() {
+      var array = [1, 2, 3];
+      var returnedArray = fill(array, 4);
+      eq(array[0], 4);
+      eq(array[1], 4);
+      eq(array[2], 4);
+  },
+    
+  'If there is a start argument, it should begin modifying the array from the start index': function() {
+      var array = [1, 2, 3];
+      var returnedArray = fill(array, 4, 1);
+      eq(array[0], 1);
+      eq(array[1], 4);
+      eq(array[2], 4);
+  },
+  
+  'If there is an end argument, it should stop modifying the array at the end index': function() {
+      var array = [1, 2, 3];
+      var returnedArray = fill(array, 4, 1, 2);
+      eq(array[0], 1);
+      eq(array[1], 4);
+      eq(array[2], 3);
+  },    
+    
+  'If start is negative, it should be treated as array.length + start': function() {
+      var array = [1, 2, 3];
+      var returnedArray = fill(array, 4, -1);
+      eq(array[0], 1);
+      eq(array[1], 2);
+      eq(array[2], 4);
+  },
+    
+  'If end is negative, it should be treated as array.length + end': function() {
+      var array = [1, 2, 3];
+      var returnedArray = fill(array, 4, 0, -1);
+      eq(array[0], 4);
+      eq(array[1], 4);
+      eq(array[2], 3);
+  },
+    
+  'It should return [1, 4, 3]': function() {
+      var array = [1, 2, 3];
+      var returnedArray = fill(array, 4, -2, -1);
+      eq(array[0], 1);
+      eq(array[1], 4);
+      eq(array[2], 3);
+  },
+    
+  'It should return [1, 2, 3](1)': function() {
+      var array = [1, 2, 3];
+      var returnedArray = fill(array, 4, 2, 2);
+      eq(array[0], 1);
+      eq(array[1], 2);
+      eq(array[2], 3);
+  },
+    
+  'It should return [1, 2, 3](2)': function() {
+      var array = [1, 2, 3];
+      var returnedArray = fill(array, 4, 1, 0);
+      eq(array[0], 1);
+      eq(array[1], 2);
+      eq(array[2], 3);
+  },        
+    
+  'If there is no value argument, it should modify all the elements with undefined': function() {
+      var array = [1, 2, 3];
+      var returnedArray = fill(array);
+      eq(array[0], undefined);
+      eq(array[1], undefined);
+      eq(array[2], undefined);
+  },      
+    
+  'If start and end arguments are not numbers, default them to 0 and array.length': function() {
+      var array = [1, 2, 3];
+      var returnedArray = fill(array, 4, 'a', true);
+      eq(array[0], 4);
+      eq(array[1], 4);
+      eq(array[2], 4);
+  }
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

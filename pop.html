@@ -1,0 +1,73 @@
+<script src="simpletest.js"></script>
+
+<script>
+    
+function pop(array) {
+    
+    var removedElement;
+    
+    if (!Array.isArray(array)) {
+        throw new TypeError('Pop with no array');
+    }
+    
+    if (array.length === 0) {
+        return removedElement;
+    }
+    
+    removedElement = array[array.length - 1];
+    array.length = array.length - 1;
+    
+    return removedElement;
+}
+
+tests({
+
+  'The only argument should be an array': function() {
+      var array = [1];
+      pop(array);
+      eq(Array.isArray(array), true);  
+  },
+    
+  'If not, it should throw TypeError': function() {
+      var isTypeError = false;
+      try {
+        pop(3);
+      } catch(e) {
+        isTypeError = (e instanceof TypeError);
+      }
+      eq(isTypeError, true);
+  },
+    
+  'It should remove the last element of the array, and return it': function() {
+      var array = [1, 2, 3];
+      var removedElement = pop(array);
+      eq(removedElement, 3);
+      eq(array.length, 2);
+      eq(array[0], 1);
+      eq(array[1], 2);
+      eq(array[3], undefined);
+  },
+    
+  'If the array is empty, it should return undefined': function() {
+      var array = [];
+      var removedElement = pop(array);
+      eq(removedElement, undefined);
+  }
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,120 @@
+<script src="simpletest.js"></script>
+
+<script>
+    
+function join(array, separator) {
+    
+    var returnedValue = '';
+    
+    if (!Array.isArray(array)) {
+        throw new TypeError('Join with no array');
+    }
+    
+    if (array.length === 0) {
+        returnedValue = '';
+        return returnedValue;
+    } 
+    
+    if (arguments.length === 1) {
+        arguments[1] = ',';
+    }
+    for (var i = 0; i < array.length; i++) {
+        if (i === (array.length - 1)) {
+            arguments[1] = '';
+        }
+        if (array[i] === undefined || array[i] === null) {
+            array[i] = '';
+            returnedValue = returnedValue + array[i] + arguments[1];
+        } else if (typeof array[i] === 'string') {
+            returnedValue = returnedValue + array[i] + arguments[1]; 
+        } else {
+            returnedValue = returnedValue + JSON.stringify(array[i]) + arguments[1];
+        }     
+    }
+     
+    return returnedValue;
+}
+
+tests({
+
+  'The first argument should be an array': function() {
+      var array = [1];
+      join(array);
+      eq(Array.isArray(array), true);  
+  },
+    
+  'If not, it should throw TypeError': function() {
+      var isTypeError = false;
+      try {
+        join(3);
+      } catch(e) {
+        isTypeError = (e instanceof TypeError);
+      }
+      eq(isTypeError, true);
+  },
+    
+  'If the element in the array is a string, it should return it': function() {
+      var array = ['a'];
+      var returnedValue = join(array);
+      eq(returnedValue, 'a');
+  },
+    
+  'If the element in the array is not a string, it should convert it to a string and return it': function() {
+      var array = [1];
+      var returnedValue = join(array);
+      eq(returnedValue, '1');
+  },    
+    
+  'If an element is undefined, null or an empty array, an empty string should be returned': function() {
+      var array1 = [undefined];
+      var array2 = [null];
+      var array3 = [];
+      var returnedValue1 = join(array1);
+      var returnedValue2 = join(array2);
+      var returnedValue3 = join(array3);
+      eq(returnedValue1, '');
+      eq(returnedValue2, '');
+      eq(returnedValue3, '');
+  },
+    
+  'If there is no separator, it should merge the items of the given array with comas between them, and return a string': function() {
+      var array = ['a', 2, true];
+      var returnedValue = join(array);
+      eq(returnedValue, 'a,2,true');
+  },
+    
+  'If a separator exists, it should merge the items of the given array with the separator between them, and return a string': function() {
+      var array = ['a', 'b', 3];
+      var returnedValue = join(array, '-');
+      eq(returnedValue, 'a-b-3');
+  },
+    
+  'If the separator is an empty string, it should merge the items of the given array with no space between them, and return a string': function() {
+      var array = ['a', 'b', 3];
+      var returnedValue = join(array, '');
+      eq(returnedValue, 'ab3');
+  },
+    
+  'If an element is undefined, null or an empty array, it should be converted to an empty string': function() {
+      var array = ['a', undefined, 2, null, true, , 'b'];
+      var returnedValue = join(array);
+      eq(returnedValue, 'a,,2,,true,,b');
+  }
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

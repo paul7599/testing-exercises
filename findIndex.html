@@ -1,0 +1,127 @@
+<script src="simpletest.js"></script>
+
+<script>
+    
+function findIndex(array, callback, optionalThis) {
+    var originalArray = [];
+    var length = array.length;
+    var findIndexCallback = callback;
+    
+    if (optionalThis) {
+        findIndexCallback = callback.bind(optionalThis);  
+    }
+    
+    for (var i = 0; i < array.length; i++) {
+        originalArray.push(array[i]);
+    }
+    
+     
+    for (var i = 0; i < length; i++) {    
+        if (findIndexCallback(array[i], i, array)) {
+            if (array.length === originalArray.length) {
+                return i;
+            } else {
+                array = originalArray;
+                return i;
+            }
+        }
+    }    
+    return -1;
+};        
+        
+tests({
+
+  'It should pass the ith element as the first argument of the callback': function() {
+      findIndex([1], function(element) {
+      eq(element, 1);
+      });
+  },
+    
+  'It should pass in position i as the second argument to the callback': function() {
+      findIndex([1], function(element, index) {
+      eq(index, 0)
+   });       
+  },
+    
+  'It should pass in the original array as the third argument to the callback': function() {
+      testArray = [1, 2, 3];
+      findIndex(testArray, function(element, index, originalArray) {
+      eq(testArray, originalArray);      
+      })
+  },    
+    
+  'It should accept an optional this object': function() {
+      findIndex([1], function() {
+      eq(this.description, 'I should be accessible inside of the callback');      
+    }, {description: 'I should be accessible inside of the callback'});  
+  },
+    
+    
+    
+    
+  'It should execute the callback for each element of the array, until it returns a truthy value': function() {
+      var testArray = [1, 2, 3];
+      var foundElement = findIndex(testArray, function(element) { 
+          return element > 1;      
+      });
+      eq(Boolean(foundElement), true);
+  },
+    
+  'It should return the index of the first element that passes the callback': function() {
+      var testArray = [1, 2, 3];
+      var foundElement = findIndex(testArray, function(element) {
+          return element > 1;
+      });
+      eq(foundElement, 1);
+  },      
+    
+  'If there is no truthy value to be returned, return -1': function() {
+      var testArray = [1, 0, -1];
+      var foundElement = findIndex(testArray, function(element) {
+          return element > 1;
+      });
+      eq(foundElement, -1);
+  },
+     
+  'The callback should not visit any elements added (pushed) to the array after the call to find begins': function() {
+      var testArray = [1, 4, 1];
+      var foundElement = findIndex(testArray, function(element) {
+          testArray.push(9);
+          return element > 1;
+      });
+      eq(foundElement, 1);
+  },
+    
+  'The callback should not visit any elements added (unshifted) to the array after the call to find begins': function() {
+      var testArray = [1, 2, 1];
+      var foundElement = findIndex(testArray, function(element) {
+          testArray.unshift(9);
+          return element > 1;
+      });
+      eq(foundElement, -1);
+  },    
+    
+  'If an existing, unvisited element of the array is changed by callback, its value passed to the callback should be the value at the time findIndex visits the element\'s index': function() {
+      var testArray = [1, 2, 3];
+      var foundElement = findIndex(testArray, function(element) {
+          testArray[1] = 5
+          return element > 1;
+      });
+      eq(foundElement, 1);
+  },    
+    
+  'The callback should visit any elements deleted from the array after the call to find begins': function() {
+      var testArray = [1, 2, 1, , 1, 1];
+      var numberOfTimesCallbackHasRun = 0;
+      var foundElement = findIndex(testArray, function(element) {
+          delete testArray[1];
+          numberOfTimesCallbackHasRun++;
+          return element > 1;
+      });
+      eq(numberOfTimesCallbackHasRun, 6);
+  }
+    
+});
+    
+</script>
+

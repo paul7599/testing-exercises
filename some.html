@@ -1,0 +1,154 @@
+<script src="simpletest.js"></script>
+
+<script>
+    
+function some(array, callback, optionalThis) {
+    var originalArray = [];
+    var length = array.length;
+    var someCallback = callback;
+    
+    if (optionalThis) {
+        someCallback = callback.bind(optionalThis);  
+    }
+    
+    for (var i = 0; i < array.length; i++) {
+        originalArray.push(array[i]);
+    }
+     
+    for (var i = 0; i < length; i++) {
+        if (array.length === originalArray.length) {
+            if (array[i] !== undefined) {
+                if (someCallback(array[i], i, array)) {
+                    return true;
+                }    
+            } 
+        } else {
+            array = originalArray;
+            if (someCallback(array[i], i, array)) {
+                return true;
+            }
+        }          
+    }
+    return false;     
+};        
+    
+tests({
+
+  'It should pass the ith element as the first argument of the callback': function() {
+      some([1], function(element) {
+      eq(element, 1);
+      });
+  },
+    
+  'It should pass in position i as the second argument to the callback': function() {
+      some([1], function(element, index) {
+      eq(index, 0)
+   });       
+  },
+    
+  'It should pass in the original array as the third argument to the callback': function() {
+      testArray = [1, 2, 3];
+      some(testArray, function(element, index, originalArray) {
+      eq(testArray, originalArray);      
+      })
+  },    
+    
+  'It should accept an optional this object': function() {
+      some([1], function() {
+      eq(this.description, 'I should be accessible inside of the callback');      
+    }, {description: 'I should be accessible inside of the callback'});  
+  },
+    
+    
+    
+    
+  'It should execute the callback for each element of the array, until it finds a truthy value': function() {
+      var numberOfTimesCallbackHasRun = 0
+      var testArray = [1, 1, 2];
+      var trueOrFalse = some(testArray, function(element) {
+          numberOfTimesCallbackHasRun++;
+          return element > 1;     
+      });
+      eq(numberOfTimesCallbackHasRun, 3);
+      eq(trueOrFalse, true);
+  },
+    
+  'It should return false if all no elements of the array pass the callback': function() {
+      var testArray = [1, 0, -1];
+      var trueOrFalse = some(testArray, function(element) {
+          return element > 1;
+      });
+      eq(trueOrFalse, false);
+  },
+    
+  'It should return false if the array is empty': function() {
+      var testArray = [];
+      var trueOrFalse = some(testArray, function(element) {
+          return element > 1;
+      });
+      eq(trueOrFalse, false);
+  },    
+    
+  'The callback should not visit any elements added (pushed) to the array after the call to find begins': function() {
+      var numberOfTimesCallbackHasRun = 0
+      var testArray = [1, 1, 1];
+      var trueOrFalse = some(testArray, function(element) {
+          testArray.push(2);
+          numberOfTimesCallbackHasRun++;
+          return element > 1;
+      });
+      eq(numberOfTimesCallbackHasRun, 3);
+      eq(trueOrFalse, false);
+  },
+    
+  'The callback should not visit any elements added (unshifted) to the array after the call to find begins': function() {
+      var numberOfTimesCallbackHasRun = 0
+      var testArray = [1, 1, 1];
+      var trueOrFalse = some(testArray, function(element) {
+          testArray.unshift(5);
+          numberOfTimesCallbackHasRun++;
+          return element > 1;
+      });
+      eq(numberOfTimesCallbackHasRun, 3);
+      eq(trueOrFalse, false);
+  },
+    
+  'If an existing, yet-unvisited element of the array is changed by callback, its value passed to the callback should be the value at the time find visits that element\'s index.': function() {
+      var numberOfTimesCallbackHasRun = 0;
+      var testArray = [1, 0, 1];
+      var trueOrFalse = some(testArray, function(element) {
+          numberOfTimesCallbackHasRun++;
+          testArray[1] = 5
+          return element > 1;
+      });
+      eq(trueOrFalse, true);
+      eq(numberOfTimesCallbackHasRun, 2);
+  },    
+    
+  'The callback should not visit any elements deleted from the array after the call to find begins': function() {
+      var testArray = [1, 2, 1, 0];
+      var numberOfTimesCallbackHasRun = 0;
+      var trueOrFalse = some(testArray, function(element) {
+          delete testArray[1];
+          numberOfTimesCallbackHasRun++;
+          return element > 1;
+      });
+      eq(numberOfTimesCallbackHasRun, 3);
+      eq(trueOrFalse, false);
+  },
+    
+  'The callback should not visit any holes in the array': function() {
+      var testArray = [, , 1, 1, , 1];
+      var numberOfTimesCallbackHasRun = 0;
+      var trueOrFalse = some(testArray, function(element) {
+          numberOfTimesCallbackHasRun++;
+          return element > 1;
+      });
+      eq(numberOfTimesCallbackHasRun, 3);
+      eq(trueOrFalse, false);
+  }    
+    
+});
+    
+</script>
+

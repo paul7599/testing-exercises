@@ -1,0 +1,144 @@
+<script src="simpletest.js"></script>
+
+<script>
+    
+function unshift(array) {
+    
+    var originalArray = [];
+    
+    if (!Array.isArray(array)) {
+        throw new TypeError('Unshift with no array');
+    }
+    
+    if (array.length === 0) {
+        for (var i = 0; i < arguments.length - 1; i++) {
+            array[i] = arguments[i + 1];
+        }
+        return array.length;
+    }
+    
+    for (var i = 0; i < array.length; i++) {
+        originalArray[i] = array[i];
+    }
+    
+    if (arguments.length > 1) {
+        for (var i = 0; i < arguments.length - 1; i++) {
+            array[i] = arguments[i + 1]; 
+        }
+        for (var i = 0; i < originalArray.length; i++) {
+            array[arguments.length -1 + i] = originalArray[i];
+        }       
+    }
+    
+    return array.length;
+}
+
+tests({
+
+  'The first argument should be an array': function() {
+      var array = [1];
+      unshift(array);
+      eq(Array.isArray(array), true);  
+  },
+    
+  'If not, it should throw TypeError': function() {
+      var isTypeError = false;
+      try {
+        unshift(3);
+      } catch(e) {
+        isTypeError = (e instanceof TypeError);
+      }
+      eq(isTypeError, true);
+  },
+    
+  'If there is just one argument, it should return the length of the array unchanged': function() {
+      var array = [1, 2, 3];
+      var returnedValue = unshift(array);
+      eq(returnedValue, 3);
+      eq(array[0], 1);
+      eq(array[1], 2);
+      eq(array[2], 3);
+  },  
+    
+  'If there are more than 1 arguments, it should add them at the begining of the array, and return the length modified(1)': function() {
+      var array = [1, 2, 3];
+      var returnedValue = unshift(array, 4, 5);
+      eq(returnedValue, 5);
+      eq(array[0], 4);
+      eq(array[1], 5);
+      eq(array[2], 1);
+      eq(array[3], 2);
+      eq(array[4], 3);
+  },
+  
+  'If there are more than 1 arguments, it should add them at the begining of the array, and return the length modified(2)': function() {
+      var array = [1];
+      var returnedValue = unshift(array, 4, 5, 6, 7);
+      eq(returnedValue, 5);
+      eq(array[0], 4);
+      eq(array[1], 5);
+      eq(array[2], 6);
+      eq(array[3], 7);
+      eq(array[4], 1);
+  },    
+    
+  'If there are more than 1 arguments, it should add them at the begining of the array, and return the length modified(3)': function() {
+      var array = [1, 2];
+      var returnedValue = unshift(array, 3, 4);
+      eq(returnedValue, 4);
+      eq(array[0], 3);
+      eq(array[1], 4);
+      eq(array[2], 1);
+      eq(array[3], 2);
+  },
+    
+  'If there are more than 1 arguments, it should add them at the begining of the array, and return the length modified(4)': function() {
+      var array = [1, 2, 3, 4, 5];
+      var returnedValue = unshift(array, 6, 7);
+      eq(returnedValue, 7);
+      eq(array[0], 6);
+      eq(array[1], 7);
+      eq(array[2], 1);
+      eq(array[3], 2);
+      eq(array[4], 3);
+      eq(array[5], 4);
+      eq(array[6], 5);
+  },    
+    
+  'If there are more than 1 arguments, it should add them at the begining of the array, and return the length modified(5)': function() {
+      var array = [1, 2];
+      var returnedValue = unshift(array, 3, 4, 5, 6);
+      eq(returnedValue, 6);
+      eq(array[0], 3);
+      eq(array[1], 4);
+      eq(array[2], 5);
+      eq(array[3], 6);
+      eq(array[4], 1);
+      eq(array[5], 2);
+  },    
+    
+  'If the length of the array cannot be converted to a number, it should default to 0': function() {
+      var array = [];
+      var returnedValue = unshift(array, 1, 2);
+      eq(returnedValue, 2);
+      eq(array[0], 1);
+      eq(array[1], 2);
+  }
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
